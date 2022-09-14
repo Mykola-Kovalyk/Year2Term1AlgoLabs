@@ -1,6 +1,7 @@
 import unittest
 import random
-from binary_tree import BinaryTree
+from avl_tree import BinaryTree
+from math import log2
 
 class Film:
 
@@ -101,6 +102,8 @@ class MyTestCase(unittest.TestCase):
             self.assertEqual(bin_tree[test_subject_2.name], None)
             for film in test_list:
                 self.assertEqual(bin_tree[film.name], film)
+
+            self.assertLessEqual(bin_tree.get_max_depth(),  int(log2(2 * bin_tree.size())))
 
             remove_test_list = list(test_list)
             while len(remove_test_list) > 0:

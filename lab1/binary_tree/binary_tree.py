@@ -208,44 +208,42 @@ class BinaryTree:
 
         return current_node
 
-    def _remove_node(self, node_to_remove: BinaryTree.Node) -> BinaryTree.Node:
-        is_right = node_to_remove.is_right()
+    def _new_node(self, key):
+        new_node = BinaryTree.Node(key)
+        new_node.left = new_node.right = new_node.parent = None
 
-        if node_to_remove.right is not None:
-            replacement = self._find_the_smallest_node_in_the_branch(
-                node_to_remove.right)
+        return new_node
 
-            if replacement.parent is not node_to_remove:
-                replacement.parent.set_left(replacement.right)
-            else:
-                node_to_remove.set_right(replacement.right)
+    def _replace_node(self, node_to_replace: Node) -> Node:
 
-            node_to_remove.key = replacement.key
-            node_to_remove.value = replacement.value
+        replacement = node_to_replace
 
-        elif node_to_remove.left is not None:
-            replacement = self._find_the_biggest_node_in_the_branch(
-                node_to_remove.left)
+        if node_to_replace.right is not None:
+            replacement = self._find_the_smallest_node_in_the_branch(node_to_replace.right)
+        elif node_to_replace.left is not None:
+            replacement = self._find_the_biggest_node_in_the_branch(node_to_replace.left)
 
-            if replacement.parent is not node_to_remove:
-                replacement.parent.set_right(replacement.left)
-            else:
-                node_to_remove.set_left(replacement.left)
+        node_to_replace.key = replacement.key
+        node_to_replace.value = replacement.value
 
-            node_to_remove.key = replacement.key
-            node_to_remove.value = replacement.value
+        return replacement
 
-        elif node_to_remove.parent is not None:
-
-            if is_right:
-                node_to_remove.parent.set_right(None)
-            else:
-                node_to_remove.parent.set_left(None)
-
-        else:
+    def _prune_leaf_node(self, node_to_prune: Node) -> None:
+        
+        if node_to_prune.parent is None:
             self._root = None
-
+        else:
+            replacement = node_to_prune.left if node_to_prune.left is not None else node_to_prune.right
+            if node_to_prune.is_right():
+                node_to_prune.parent.set_right(replacement)
+            else:
+                node_to_prune.parent.set_left(replacement)
+        
         self._size -= 1
+
+    def _remove_node(self, node_to_remove: Node) -> Node:
+        prune_node =  self._replace_node(node_to_remove)
+        self._prune_leaf_node(prune_node)
 
     @staticmethod
     def _find_the_smallest_node_in_the_branch(node: BinaryTree.Node) -> BinaryTree.Node:
