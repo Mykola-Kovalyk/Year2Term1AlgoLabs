@@ -83,7 +83,7 @@ class BinaryTree:
                 identation += 1
                 current_parent = current_parent.parent
 
-            final_string += f"\n{'-' * identation} {'r' if item.color else 'b'} {'r' if item.is_right() else 'l'} [{hash(item.key)}] {item.key}"
+            final_string += f"\n{'-' * identation} {'r' if item.is_right() else 'l'} [{hash(item.key)}] {item.key}"
 
         return final_string
 
