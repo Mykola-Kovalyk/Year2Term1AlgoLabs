@@ -1,4 +1,5 @@
 from __future__ import annotations
+from operator import irshift
 from typing import Any, List, Tuple, Callable
 
 
@@ -50,6 +51,16 @@ class RedBlackTree:
                 return None
 
             return self is self.parent.right
+
+        def black_height(self):
+            node = self
+            height = 0
+            while node is not NULL:
+                if node.color is BLACK:
+                    height += 1
+                node = node.parent
+            
+            return height
 
     def __init__(self):
 
@@ -188,7 +199,9 @@ class RedBlackTree:
 
     def _new_node(self, key):
         new_node = RedBlackTree.Node(key)
-        new_node.left = new_node.right = new_node.parent = NULL
+        new_node.left = NULL
+        new_node.right = NULL
+        new_node.parent = NULL
 
         return new_node
 
@@ -206,7 +219,9 @@ class RedBlackTree:
 
         return replacement
 
-    def _prune_leaf_node(self, node_to_prune: RedBlackTree.Node) -> None:
+    def _prune_leaf_node(self, node_to_prune: RedBlackTree.Node) -> RedBlackTree.Node:
+
+        replacement = None
         
         if node_to_prune.parent is NULL:
             self._root = NULL
@@ -219,10 +234,16 @@ class RedBlackTree:
         
         self._size -= 1
 
+        return replacement
+
     def _remove_node(self, node_to_remove: RedBlackTree.Node) -> RedBlackTree.Node:
         prune_node =  self._replace_node(node_to_remove)
-        self._remove_fixup(prune_node)
-        self._prune_leaf_node(prune_node)
+
+        original_color =  prune_node.color
+        fixup_node = self._prune_leaf_node(prune_node)
+
+        if original_color is BLACK:
+            self._remove_fixup(fixup_node)
 
     def get_max_depth(self):
         depth = 0
@@ -246,7 +267,7 @@ class RedBlackTree:
         if node.parent.parent is NULL:
             return
 
-        while node.parent.color is RED:
+        while node is not self.root and node.parent.color is RED:
             if node.parent == node.parent.parent.right:
                 uncle = node.parent.parent.left
                 if uncle.color is RED:
@@ -276,29 +297,74 @@ class RedBlackTree:
                     node.parent.color = BLACK
                     node.parent.parent.color = RED
                     self._right_rotate(node.parent.parent)
-            if node is self.root:
-                break
 
         self.root.color = BLACK
 
     def _remove_fixup(self, node):
-        pass
+        while node is not self.root and node.color is BLACK:
+            if node is node.parent.left:
+                sibling = node.parent.right
+                if sibling.color is RED:
+                    sibling.color = BLACK
+                    node.parent.color = RED
+                    self._left_rotate(node.parent)
+                    sibling = node.parent.right
+
+                if sibling.left.color is BLACK and sibling.right.color is BLACK:
+                    sibling.color = RED
+                    node = node.parent
+                else:
+                    if sibling.right.color is BLACK:
+                        sibling.left.color = BLACK
+                        sibling.color = RED
+                        self._right_rotate(sibling)
+                        sibling = node.parent.right
+
+                    sibling.color = node.parent.color
+                    node.parent.color = BLACK
+                    sibling.right.color = BLACK
+                    self._left_rotate(node.parent)
+                    node = self.root
+            else:
+                sibling = node.parent.left
+                if sibling.color is RED:
+                    sibling.color = BLACK
+                    node.parent.color = RED
+                    self._right_rotate(node.parent)
+                    sibling = node.parent.left
+
+                if sibling.right.color is BLACK and sibling.left.color is BLACK:
+                    sibling.color = RED
+                    node = node.parent
+                else:
+                    if sibling.left.color is BLACK:
+                        sibling.right.color = BLACK
+                        sibling.color = RED
+                        self._left_rotate(sibling)
+                        sibling = node.parent.left
+
+                    sibling.color = node.parent.color
+                    node.parent.color = BLACK
+                    sibling.left.color = BLACK
+                    self._right_rotate(node.parent)
+                    node = self.root
+        node.color = BLACK
 
     def _left_rotate(self, node):
-        right_node = node.right
-        node.right = right_node.left
-        if right_node.left != NULL:
-            right_node.left.parent = node
+        new_parent = node.right
+        node.right = new_parent.left
+        if new_parent.left != NULL:
+            new_parent.left.parent = node
 
-        right_node.parent = node.parent
+        new_parent.parent = node.parent
         if node.parent == NULL:
-            self.root = right_node
+            self.root = new_parent
         elif node == node.parent.left:
-            node.parent.left = right_node
+            node.parent.left = new_parent
         else:
-            node.parent.right = right_node
-        right_node.left = node
-        node.parent = right_node
+            node.parent.right = new_parent
+        new_parent.left = node
+        node.parent = new_parent
 
     def _right_rotate(self, node):
         left_node = node.left
@@ -314,7 +380,9 @@ class RedBlackTree:
         else:
             node.parent.left = left_node
         left_node.right = node
-        node.parent = left_node
+        node.parent = left_node            
+    
+
 
     def _find_the_smallest_node_in_the_branch(self, node: RedBlackTree.Node) -> RedBlackTree.Node:
 
