@@ -1,9 +1,5 @@
 
 
-class YourLuckNotFoundException(Exception):
-    pass
-
-
 def preprocess(pattern_string):
     pattern = {}
 
@@ -17,7 +13,7 @@ def preprocess(pattern_string):
 def bad_character(string, pattern_string, pattern, position):
 
     if position + len(pattern_string) > len(string):
-        raise YourLuckNotFoundException("Try later... or harder")
+        return -1
     
     shift_value = 0
     for index, char in  reversed(list(enumerate(pattern_string))):
@@ -41,6 +37,8 @@ def boyer_moore(string, pattern_string):
 
     while (shift := bad_character(string, pattern_string, pattern, current_position)) > 0 and current_position < len(string):
         current_position += shift
+    
+    current_position = -1 if shift < 0 else current_position 
 
     
     return current_position
