@@ -51,5 +51,3 @@ def compute_lps(pattern):
 
 if __name__ == '__main__':
     print(knuth_morris_pratt("CACACФФAACAACACACA!", "AACAC"))
-
-# This code is contributed by Bhavya Jain
