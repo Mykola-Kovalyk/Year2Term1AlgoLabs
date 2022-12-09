@@ -1,8 +1,5 @@
-import pylab
-import networkx as nx
-from networkx.drawing.nx_agraph import graphviz_layout
 
-class WhatTheFuckException(Exception):
+class WhatTheHeckException(Exception):
     pass
 
 
@@ -22,7 +19,7 @@ def get_data(input_file):
         line_list = [ x for x in list(line) if x != '\n']
         
         if len(line_list) != width:
-            raise WhatTheFuckException(f"What the fuck are you putting in? Open your eyes and check how many letters in row '{line}'")
+            raise WhatTheHeckException(f"What the heck are you putting in? Open your eyes and check how many letters in row '{line}'")
         
         letter_matrix.append(line_list)
 
@@ -109,11 +106,3 @@ if __name__ ==  '__main__':
             if node in nodes:
                 continue 
             nodes.append(node)
-    
-    if True:
-        G = nx.DiGraph()
-        G.add_edges_from(converted)
-        pos = graphviz_layout(G, prog='dot', args="-Grankdir=LR")
-        nx.draw(G, with_labels = True, pos=pos)
-        pylab.show()
-    
