@@ -26,7 +26,7 @@ def get_data(input_file):
     return width, height, letter_matrix
         
 
-def convert(data, width, heigth):
+def convert(data, width, height):
 
 
     converted  = []
